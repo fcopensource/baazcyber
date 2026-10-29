@@ -6,8 +6,30 @@ const dialog = window.__TAURI__.dialog;
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 
-// Inject the SVG gradient the ring and icons reference.
-document.body.insertAdjacentHTML("beforeend", `<svg class="defs"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5df2e0"/><stop offset=".5" stop-color="#36b6ff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs></svg>`);
+// Inject the SVG gradient the ring uses — Veyra mint-teal.
+document.body.insertAdjacentHTML("beforeend", `<svg class="defs"><defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#92d3c5"/><stop offset="1" stop-color="#6ec6b5"/></linearGradient></defs></svg>`);
+
+// Build a rotating 3D wireframe globe into every [data-globe] slot.
+function buildGlobe(node) {
+  const inner = el("div", "globe-inner");
+  // Longitude meridians — rings fanned around the vertical axis.
+  for (let i = 0; i < 9; i++) {
+    const r = el("div", "g-ring" + (i % 3 === 0 ? " lit" : ""));
+    r.style.transform = `rotateY(${i * 20}deg)`;
+    inner.appendChild(r);
+  }
+  // Latitude rings — horizontal discs stacked top to bottom, shrinking toward the poles.
+  for (let i = -2; i <= 2; i++) {
+    const r = el("div", "g-ring" + (i === 0 ? " lit" : ""));
+    const s = Math.cos(i * 0.62).toFixed(3);
+    r.style.transform = `rotateX(90deg) translateZ(${i * 30}px) scale(${s})`;
+    inner.appendChild(r);
+  }
+  node.appendChild(inner);
+  node.appendChild(el("div", "globe-core"));
+  node.appendChild(el("div", "globe-sweep"));
+}
+document.querySelectorAll("[data-globe]").forEach(buildGlobe);
 
 const state = { scanning: false, lastDetections: [] };
 
@@ -53,6 +75,7 @@ async function runScan(paths, label) {
   if (state.scanning) return;
   state.scanning = true;
   state.lastDetections = [];
+  document.body.classList.add("scanning");
   show("scan");
   $("#scanTitle").textContent = label;
   $("#scanPath").textContent = paths.length ? paths.join("  ·  ") : "The usual places malware arrives";
@@ -83,6 +106,7 @@ async function runScan(paths, label) {
   } finally {
     if (unlisten) unlisten();
     state.scanning = false;
+    document.body.classList.remove("scanning");
     $("#scanBar").hidden = true;
     $("#runScanBtn").hidden = false;
     $("#pickFolderBtn").hidden = false;

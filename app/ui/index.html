@@ -15,7 +15,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="brand">
-        <img src="logo.svg" alt="" width="40" height="40">
+        <img src="logo.svg" alt="" width="38" height="38">
         <div><strong>BaazCyber</strong><small>Antivirus</small></div>
       </div>
       <nav>
@@ -35,12 +35,13 @@
       <section class="view" data-view="home">
         <div class="shield-stage">
           <div class="shield-ring" id="shieldRing">
-            <svg class="ring-svg" viewBox="0 0 220 220">
-              <circle class="ring-track" cx="110" cy="110" r="100"/>
-              <circle class="ring-prog" id="ringProg" cx="110" cy="110" r="100"/>
+            <svg class="ring-svg" viewBox="0 0 240 240">
+              <circle class="ring-track" cx="120" cy="120" r="110"/>
+              <circle class="ring-prog" id="ringProg" cx="120" cy="120" r="110"/>
             </svg>
             <div class="shield-core" id="shieldCore">
-              <img src="logo.svg" alt="" width="96" height="96" id="shieldImg">
+              <div class="globe" data-globe></div>
+              <div class="globe-badge"><img src="logo-mark.svg" width="40" height="40" alt=""></div>
               <div class="sweep" id="sweep" hidden></div>
             </div>
           </div>
@@ -74,15 +75,19 @@
           </div>
         </div>
 
-        <div class="scanbar glass" id="scanBar" hidden>
-          <div class="scanbar-top">
-            <span class="pulse-dot"></span>
-            <b id="scanCount">0</b><span class="muted">files scanned</span>
-            <span class="spacer"></span>
-            <b id="scanThreats" class="threat-count">0</b><span class="muted">threats</span>
+        <div class="scan-stage" id="scanBar" hidden>
+          <div class="scan-orbit">
+            <div class="globe big" data-globe></div>
+            <div class="scan-ping" aria-hidden="true"></div>
           </div>
-          <div class="scan-file muted" id="scanFile">Starting…</div>
-          <div class="progress-line"><i id="progressFill"></i></div>
+          <div class="scan-readout">
+            <div class="scan-live"><span class="pulse-dot"></span><span class="scan-file" id="scanFile">Starting…</span></div>
+            <div class="progress-line"><i id="progressFill"></i></div>
+            <div class="scan-nums">
+              <div><b id="scanCount">0</b><span>files scanned</span></div>
+              <div><b id="scanThreats" class="threat-count">0</b><span>threats</span></div>
+            </div>
+          </div>
         </div>
 
         <div class="results" id="results">
