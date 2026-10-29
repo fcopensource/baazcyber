@@ -9,6 +9,8 @@ license = "Proprietary"
 authors = ["BaazCyber, a FlightCoders company"]
 
 [profile.release]
-lto = true
-codegen-units = 1
+# Thin LTO and several codegen units keep peak memory low enough for an 8-16 GB machine.
+lto = "thin"
+codegen-units = 16
+opt-level = 2
 strip = true

@@ -1,2 +1,7 @@
 /target
 *.quarantine
+node_modules/
+app/node_modules/
+*.key
+*.privkey
+DEPLOY.md

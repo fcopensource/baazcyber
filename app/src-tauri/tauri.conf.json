@@ -1,1 +1,45 @@
-{"$schema":"https://schema.tauri.app/config/2","productName":"BaazCyber Antivirus","version":"0.1.0","identifier":"com.flightcoders.baazcyber","app":{"withGlobalTauri":true,"windows":[{"title":"BaazCyber Antivirus","width":1180,"height":780,"minWidth":940,"minHeight":660,"resizable":true,"decorations":true}],"security":{"csp":"default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:"}},"build":{"frontendDist":"../ui"},"bundle":{"active":true,"targets":["nsis"],"icon":["icons/icon.ico","icons/icon.png"],"category":"Utility","shortDescription":"Scan and remove malware","longDescription":"BaazCyber Antivirus scans your files for malware, trojans and malicious scripts, and quarantines what it finds."}}
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "BaazCyber Antivirus",
+  "version": "0.1.0",
+  "identifier": "com.flightcoders.baazcyber",
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "BaazCyber Antivirus",
+        "width": 1180,
+        "height": 780,
+        "minWidth": 940,
+        "minHeight": 660,
+        "resizable": true,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self' data:"
+    }
+  },
+  "build": {
+    "frontendDist": "../ui"
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "icon": ["icons/icon.ico", "icons/icon.png"],
+    "category": "Utility",
+    "shortDescription": "Scan and remove malware",
+    "longDescription": "BaazCyber Antivirus scans your files for malware, trojans and malicious scripts, and quarantines what it finds.",
+    "publisher": "FlightCoders",
+    "copyright": "© FlightCoders"
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [
+        "https://veyraeditor.com/api/baazcyber/updates/{{target}}/{{arch}}/{{current_version}}"
+      ],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDVCNDY4RTAyNEVBMDFEQTMKUldTakhhQk9BbzVHVytMVyt0V1FHbVlmM1BsMFpxQzgvTEVVZFhwVFp4b045TUprOWp6Slc3bWUK"
+    }
+  }
+}
