@@ -42,14 +42,20 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run build -- --target x86_64-pc-windows-msvc
 
+      - name: Find bundle output
+        shell: bash
+        run: |
+          echo "=== bundle output ==="
+          find src-tauri/target -name "*.exe" -o -name "*.msi" 2>/dev/null | head -20 || true
+
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
           path: |
-            app/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
-            app/src-tauri/target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
-          if-no-files-found: warn
+            app/src-tauri/target/**/bundle/nsis/*.exe
+            app/src-tauri/target/**/bundle/msi/*.msi
+          if-no-files-found: error
 
   release:
     name: Create GitHub Release
