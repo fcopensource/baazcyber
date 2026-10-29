@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BaazCyber Antivirus</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Animated backdrop -->
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="logo.svg" alt="" width="40" height="40">
+        <div><strong>BaazCyber</strong><small>Antivirus</small></div>
+      </div>
+      <nav>
+        <button class="nav-item active" data-view="home"><svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.5 8-8 9.5C7.5 20 4 17 4 12V7z"/></svg>Protection</button>
+        <button class="nav-item" data-view="scan"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Scan</button>
+        <button class="nav-item" data-view="quarantine"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4m6-4v4"/></svg>Quarantine<span class="badge" id="qBadge" hidden>0</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <div class="sig-pill"><span class="dot"></span><span id="sigText">Signatures ready</span></div>
+        <small>A FlightCoders company</small>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- PROTECTION -->
+      <section class="view" data-view="home">
+        <div class="shield-stage">
+          <div class="shield-ring" id="shieldRing">
+            <svg class="ring-svg" viewBox="0 0 220 220">
+              <circle class="ring-track" cx="110" cy="110" r="100"/>
+              <circle class="ring-prog" id="ringProg" cx="110" cy="110" r="100"/>
+            </svg>
+            <div class="shield-core" id="shieldCore">
+              <img src="logo.svg" alt="" width="96" height="96" id="shieldImg">
+              <div class="sweep" id="sweep" hidden></div>
+            </div>
+          </div>
+          <h1 id="statusTitle">You're protected</h1>
+          <p id="statusSub">No threats found. Run a scan any time.</p>
+          <div class="hero-actions">
+            <button class="btn primary big" id="quickScanBtn"><svg viewBox="0 0 24 24"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12z"/></svg>Quick Scan</button>
+            <button class="btn ghost big" id="fullScanBtn">Full Scan</button>
+            <button class="btn ghost big" id="customScanBtn">Choose folder…</button>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat glass"><b id="statLastFiles">—</b><span>Files in last scan</span></div>
+          <div class="stat glass"><b id="statThreats">0</b><span>Threats found</span></div>
+          <div class="stat glass"><b id="statQ">0</b><span>In quarantine</span></div>
+          <div class="stat glass"><b id="statSig">—</b><span>Known threats</span></div>
+        </div>
+      </section>
+
+      <!-- SCAN -->
+      <section class="view" data-view="scan" hidden>
+        <div class="scan-head">
+          <div>
+            <h2 id="scanTitle">Scan</h2>
+            <p id="scanPath" class="muted">Choose what to scan, or start a quick scan.</p>
+          </div>
+          <div class="scan-controls">
+            <button class="btn ghost" id="pickFolderBtn">Choose folder…</button>
+            <button class="btn primary" id="runScanBtn">Quick Scan</button>
+            <button class="btn danger" id="stopScanBtn" hidden>Stop</button>
+          </div>
+        </div>
+
+        <div class="scanbar glass" id="scanBar" hidden>
+          <div class="scanbar-top">
+            <span class="pulse-dot"></span>
+            <b id="scanCount">0</b><span class="muted">files scanned</span>
+            <span class="spacer"></span>
+            <b id="scanThreats" class="threat-count">0</b><span class="muted">threats</span>
+          </div>
+          <div class="scan-file muted" id="scanFile">Starting…</div>
+          <div class="progress-line"><i id="progressFill"></i></div>
+        </div>
+
+        <div class="results" id="results">
+          <div class="empty" id="resultsEmpty">
+            <img src="logo-mark.svg" width="56" height="56" alt="">
+            <p>Threats will appear here.</p>
+          </div>
+        </div>
+        <div class="results-bar glass" id="resultsBar" hidden>
+          <span id="resultsSummary"></span>
+          <button class="btn primary" id="quarantineAllBtn">Quarantine all</button>
+        </div>
+      </section>
+
+      <!-- QUARANTINE -->
+      <section class="view" data-view="quarantine" hidden>
+        <div class="scan-head"><div><h2>Quarantine</h2><p class="muted">Threats here are encoded and can't run. Restore a file only if you're sure it's safe.</p></div></div>
+        <div class="results" id="qList">
+          <div class="empty" id="qEmpty"><img src="logo-mark.svg" width="56" height="56" alt=""><p>Quarantine is empty.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" hidden></div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
