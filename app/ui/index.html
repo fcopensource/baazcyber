@@ -7,94 +7,126 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="bg-orbs" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i></div>
+
+  <header class="titlebar" data-tauri-drag-region>
+    <div class="tb-brand" data-tauri-drag-region>
+      <span class="tb-logo"><img src="logo-mark.svg" alt="" width="16" height="16"></span>
+      <span class="tb-name" data-tauri-drag-region>BaazCyber <em>Antivirus</em></span>
+    </div>
+    <div class="tb-chip ok" id="tbChip" data-tauri-drag-region><span class="tb-dot"></span><span id="tbChipText">Protected</span></div>
+    <div class="tb-buttons">
+      <button class="tb-btn" id="tbMin" title="Minimize" aria-label="Minimize"><svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg></button>
+      <button class="tb-btn" id="tbMax" title="Maximize" aria-label="Maximize"><svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1.5"/></svg></button>
+      <button class="tb-btn close" id="tbClose" title="Close" aria-label="Close"><svg viewBox="0 0 12 12"><path d="m2.5 2.5 7 7m0-7-7 7"/></svg></button>
+    </div>
+  </header>
+
   <div class="app">
-    <!-- Sidebar -->
     <aside class="sidebar">
       <div class="brand">
-        <img src="logo-mark.svg" alt="" width="32" height="32">
-        <div>
-          <strong>BaazCyber</strong>
-          <small>Antivirus</small>
+        <div class="brand-badge">
+          <span class="brand-halo"></span>
+          <span class="brand-tile"><img src="logo-mark.svg" alt="" width="30" height="30"></span>
         </div>
+        <div><strong>BaazCyber</strong><small>Antivirus</small></div>
       </div>
+      <span class="nav-label">Menu</span>
       <nav>
-        <button class="nav-item active" data-view="home">
-          <svg viewBox="0 0 24 24"><path d="M12 3 20 7v5c0 5-3.5 8-8 9.5C7.5 20 4 17 4 12V7z"/></svg>
-          Protection
-        </button>
-        <button class="nav-item" data-view="scan">
-          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-          Scan
-        </button>
-        <button class="nav-item" data-view="quarantine">
-          <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4m6-4v4"/></svg>
-          Quarantine
-          <span class="badge" id="qBadge" hidden>0</span>
-        </button>
+        <button class="nav-item active" data-view="home"><span class="ic xs" data-icon="shield" data-tone="emerald"></span>Dashboard</button>
+        <button class="nav-item" data-view="scan"><span class="ic xs" data-icon="radar" data-tone="azure"></span>Scan</button>
+        <button class="nav-item" data-view="quarantine"><span class="ic xs" data-icon="vault" data-tone="amber"></span>Quarantine<span class="badge" id="qBadge" hidden>0</span></button>
+        <button class="nav-item" data-view="history"><span class="ic xs" data-icon="clock" data-tone="indigo"></span>History</button>
+        <button class="nav-item" data-view="settings"><span class="ic xs" data-icon="gear" data-tone="slate"></span>Settings</button>
       </nav>
       <div class="sidebar-foot">
-        <div class="sig-pill">
-          <span class="dot"></span>
-          <span id="sigText">Signatures ready</span>
+        <div class="guard ok" id="guardCard">
+          <span class="ic sm" data-icon="shield" data-tone="emerald" id="guardIcon"></span>
+          <div><b id="guardTitle">Protected</b><span id="sigText">Signatures ready</span></div>
         </div>
-        <small>A FlightCoders company</small>
+        <small id="verText">A FlightCoders company</small>
       </div>
     </aside>
 
-    <!-- Main -->
     <main class="main">
 
-      <!-- PROTECTION -->
+      <!-- DASHBOARD -->
       <section class="view" data-view="home">
-        <div class="hero">
-          <div class="shield-wrap" id="shieldRing">
-            <!-- Pulse rings -->
-            <div class="pulse-ring r1"></div>
-            <div class="pulse-ring r2"></div>
-            <div class="pulse-ring r3"></div>
-            <!-- Shield icon -->
-            <div class="shield-icon" id="shieldCore">
-              <img src="logo.svg" alt="" width="110" height="110" id="shieldImg">
-              <div class="scan-beam" id="sweep" hidden></div>
-            </div>
-            <!-- SVG ring progress -->
-            <svg class="ring-svg" viewBox="0 0 300 300">
-              <circle class="ring-track" cx="150" cy="150" r="134"/>
-              <circle class="ring-prog" id="ringProg" cx="150" cy="150" r="134"/>
+        <div class="hero-card">
+          <div class="stage ok" id="stage">
+            <div class="orbit o-a"><i></i></div>
+            <div class="orbit o-b"><i></i></div>
+            <svg class="shield3d" viewBox="0 0 220 250" aria-hidden="true">
+              <defs>
+                <linearGradient id="shFace" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" class="s1"/><stop offset="1" class="s2"/>
+                </linearGradient>
+                <linearGradient id="shInner" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0" class="s3"/><stop offset="1" class="s4"/>
+                </linearGradient>
+                <linearGradient id="shRim" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stop-color="#ffffff" stop-opacity=".9"/>
+                  <stop offset=".45" stop-color="#ffffff" stop-opacity=".12"/>
+                  <stop offset="1" stop-color="#ffffff" stop-opacity=".45"/>
+                </linearGradient>
+              </defs>
+              <path class="sh-depth" d="M110 24 196 56v68c0 58-38 96-86 116-48-20-86-58-86-116V56z"/>
+              <path fill="url(#shFace)" d="M110 10 196 42v68c0 58-38 96-86 116-48-20-86-58-86-116V42z"/>
+              <path fill="none" stroke="url(#shRim)" stroke-width="3" d="M110 10 196 42v68c0 58-38 96-86 116-48-20-86-58-86-116V42z"/>
+              <path fill="url(#shInner)" d="M110 36 172 59v51c0 43-27 72-62 88-35-16-62-45-62-88V59z"/>
+              <path fill="#fff" opacity=".16" d="M110 10 24 42v68c0 18 4 34 11 48C70 110 96 64 110 10z"/>
+              <g class="glyph g-ok"><path d="M78 116l22 22 44-46"/></g>
+              <g class="glyph g-threat"><path d="M110 80v42"/><path d="M110 146v2"/></g>
+              <g class="glyph g-scan"><circle cx="104" cy="110" r="24"/><path d="m122 128 20 20"/></g>
             </svg>
+            <div class="floor"></div>
           </div>
-          <h1 id="statusTitle">You're Protected</h1>
-          <p id="statusSub">BaazCyber is actively guarding your system.</p>
-          <div class="hero-actions">
-            <button class="btn primary big" id="quickScanBtn">
-              <svg viewBox="0 0 24 24"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12z"/></svg>
-              Quick Scan
-            </button>
-            <button class="btn outline big" id="fullScanBtn">Full Scan</button>
-            <button class="btn outline big" id="customScanBtn">Choose Folder…</button>
+
+          <div class="hero-text">
+            <span class="eyebrow" id="statusEyebrow">PROTECTION ACTIVE</span>
+            <h1 id="statusTitle">You're Protected</h1>
+            <p id="statusSub">BaazCyber is ready. Run a Smart Scan to check the places malware hides.</p>
+            <div class="hero-actions">
+              <button class="btn3d primary" id="quickScanBtn">Smart Scan</button>
+              <button class="btn3d ghost" id="fullScanBtn">Full Scan</button>
+              <button class="btn3d ghost report-btn" hidden>PDF Report</button>
+            </div>
+            <div class="last-scan" id="lastScanText">No scan yet</div>
+          </div>
+
+          <div class="score">
+            <svg viewBox="0 0 120 120">
+              <defs><linearGradient id="scoreGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#34f5b0"/><stop offset="1" stop-color="#22b8ff"/></linearGradient></defs>
+              <circle cx="60" cy="60" r="50" class="score-track"/>
+              <circle cx="60" cy="60" r="50" class="score-prog" id="scoreProg"/>
+            </svg>
+            <div class="score-num"><b id="scoreNum">—</b><span>Security score</span></div>
           </div>
         </div>
 
-        <div class="stat-row">
-          <div class="stat-card">
-            <div class="stat-icon safe"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
-            <b id="statLastFiles">—</b>
-            <span>Files Last Scan</span>
+        <h3 class="section-title">Scan tools</h3>
+        <div class="tiles">
+          <button class="tile" data-act="quick"><span class="ic" data-icon="bolt" data-tone="emerald"></span><b>Smart Scan</b><span>Downloads, Desktop, Documents, Temp and Startup</span></button>
+          <button class="tile" data-act="full"><span class="ic" data-icon="drive" data-tone="azure"></span><b>Full Scan</b><span>Every file on your system drive</span></button>
+          <button class="tile" data-act="folder"><span class="ic" data-icon="folder" data-tone="amber"></span><b>Folder Scan</b><span>Any folder, USB stick or external drive</span></button>
+          <button class="tile" data-act="file"><span class="ic" data-icon="file" data-tone="indigo"></span><b>File Scan</b><span>Check a single file before you open it</span></button>
+          <button class="tile" data-act="downloads"><span class="ic" data-icon="download" data-tone="cyan"></span><b>Downloads Scan</b><span>Where most infections arrive</span></button>
+          <button class="tile" data-act="startup"><span class="ic" data-icon="rocket" data-tone="rose"></span><b>Startup Scan</b><span>Programs that run when Windows starts</span></button>
+        </div>
+
+        <div class="row2">
+          <div class="stats">
+            <div class="stat"><span class="ic sm" data-icon="files" data-tone="azure"></span><div><b id="statLastFiles">—</b><span>Files last scan</span></div></div>
+            <div class="stat"><span class="ic sm" data-icon="bug" data-tone="rose"></span><div><b id="statThreats">0</b><span>Threats found</span></div></div>
+            <div class="stat"><span class="ic sm" data-icon="vault" data-tone="amber"></span><div><b id="statQ">0</b><span>In quarantine</span></div></div>
+            <div class="stat"><span class="ic sm" data-icon="db" data-tone="emerald"></span><div><b id="statSig">—</b><span>Known threats</span></div></div>
           </div>
-          <div class="stat-card">
-            <div class="stat-icon warn"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg></div>
-            <b id="statThreats">0</b>
-            <span>Threats Found</span>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon info"><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4m6-4v4"/></svg></div>
-            <b id="statQ">0</b>
-            <span>In Quarantine</span>
-          </div>
-          <div class="stat-card">
-            <div class="stat-icon purple"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-            <b id="statSig">—</b>
-            <span>Known Threats</span>
+          <div class="modules">
+            <h3>Protection engines</h3>
+            <div class="mod"><span class="ic xs" data-icon="db" data-tone="emerald"></span><div><b>Signature engine</b><small>Matches known malware by SHA-256</small></div><em>Active</em></div>
+            <div class="mod"><span class="ic xs" data-icon="brain" data-tone="indigo"></span><div><b>Heuristic engine</b><small>Spots unknown threats by behaviour</small></div><em>Active</em></div>
+            <div class="mod"><span class="ic xs" data-icon="vault" data-tone="amber"></span><div><b>Quarantine vault</b><small>Isolates threats so they cannot run</small></div><em>Ready</em></div>
+            <div class="mod"><span class="ic xs" data-icon="refresh" data-tone="azure"></span><div><b>Auto-updates</b><small>Signed updates from BaazCyber</small></div><em>On</em></div>
           </div>
         </div>
       </section>
@@ -102,67 +134,84 @@
       <!-- SCAN -->
       <section class="view" data-view="scan" hidden>
         <div class="page-head">
-          <div>
-            <h2 id="scanTitle">Scan</h2>
-            <p class="sub" id="scanPath">Choose what to scan, or start a quick scan.</p>
-          </div>
+          <div><h2 id="scanTitle">Scan</h2><p class="sub" id="scanPath">Choose what to scan, or start a Smart Scan.</p></div>
           <div class="scan-controls">
-            <button class="btn outline" id="pickFolderBtn">Choose Folder…</button>
-            <button class="btn primary" id="runScanBtn">Quick Scan</button>
-            <button class="btn danger" id="stopScanBtn" hidden>Stop</button>
+            <button class="btn3d ghost report-btn" hidden>PDF Report</button>
+            <button class="btn3d ghost" id="pickFolderBtn">Choose Folder…</button>
+            <button class="btn3d primary" id="runScanBtn">Smart Scan</button>
+            <button class="btn3d danger" id="stopScanBtn" hidden>Stop</button>
           </div>
         </div>
 
-        <!-- Scan progress card -->
-        <div class="scan-progress-card" id="scanBar" hidden>
-          <div class="scan-shield">
-            <div class="scan-shield-inner" id="shieldCore2">
-              <img src="logo.svg" alt="" width="72" height="72">
-              <div class="scan-line-anim"></div>
-            </div>
-            <svg class="mini-ring" viewBox="0 0 140 140">
-              <circle cx="70" cy="70" r="60" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="2"/>
-              <circle class="mini-ring-prog" cx="70" cy="70" r="60"/>
-            </svg>
+        <div class="scan-card" id="scanBar" hidden>
+          <div class="scanner">
+            <div class="scanner-ring"></div>
+            <div class="scanner-ring r2"></div>
+            <span class="ic lg" data-icon="radar" data-tone="azure"></span>
           </div>
           <div class="scan-info">
-            <div class="scan-status-line">
-              <span class="live-dot"></span>
-              <span class="scan-label">Scanning</span>
-            </div>
-            <div class="scan-file-path" id="scanFile">Starting…</div>
-            <div class="scan-bar-track"><div class="scan-bar-fill" id="progressFill"></div></div>
-            <div class="scan-counters">
-              <div class="counter"><b id="scanCount">0</b><span>files scanned</span></div>
-              <div class="counter accent"><b id="scanThreats">0</b><span>threats</span></div>
+            <div class="scan-status"><span class="live-dot"></span>Scanning…</div>
+            <div class="scan-file" id="scanFile">Starting…</div>
+            <div class="bar"><i></i></div>
+            <div class="counters">
+              <div><b id="scanCount">0</b><span>files</span></div>
+              <div class="danger"><b id="scanThreats">0</b><span>threats</span></div>
+              <div><b id="scanSpeed">0</b><span>files / sec</span></div>
+              <div><b id="scanTime">0:00</b><span>elapsed</span></div>
             </div>
           </div>
         </div>
 
         <div class="results" id="results">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" width="48" height="48"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-            <p>Run a scan to check for threats.</p>
-          </div>
+          <div class="empty-state"><span class="ic lg" data-icon="radar" data-tone="azure"></span><p>Run a scan to check for threats.</p></div>
         </div>
         <div class="results-bar" id="resultsBar" hidden>
           <span id="resultsSummary"></span>
-          <button class="btn primary" id="quarantineAllBtn">Quarantine All</button>
+          <button class="btn3d primary" id="quarantineAllBtn">Quarantine All</button>
         </div>
       </section>
 
       <!-- QUARANTINE -->
       <section class="view" data-view="quarantine" hidden>
+        <div class="page-head"><div><h2>Quarantine</h2><p class="sub">Isolated threats, encoded so they cannot run.</p></div></div>
+        <div class="results" id="qList"></div>
+      </section>
+
+      <!-- HISTORY -->
+      <section class="view" data-view="history" hidden>
         <div class="page-head">
-          <div>
-            <h2>Quarantine</h2>
-            <p class="sub">Isolated threats — encoded and unable to run.</p>
+          <div><h2>Scan history</h2><p class="sub">Your recent scans on this computer.</p></div>
+          <div class="scan-controls">
+            <button class="btn3d ghost report-btn" hidden>PDF Report of last scan</button>
+            <button class="btn3d ghost" id="clearHistoryBtn">Clear history</button>
           </div>
         </div>
-        <div class="results" id="qList">
-          <div class="empty-state">
-            <svg viewBox="0 0 24 24" width="48" height="48"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 9h16M9 3v4m6-4v4"/></svg>
-            <p>Quarantine is empty.</p>
+        <div class="results" id="historyList"></div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section class="view" data-view="settings" hidden>
+        <div class="page-head"><div><h2>Settings</h2><p class="sub">Updates and preferences.</p></div></div>
+        <div class="set-grid">
+          <div class="set-card">
+            <span class="ic" data-icon="refresh" data-tone="azure"></span>
+            <h3>Updates</h3>
+            <p id="updateText">BaazCyber checks for signed updates automatically.</p>
+            <div class="set-actions">
+              <button class="btn3d primary" id="checkUpdateBtn">Check for updates</button>
+              <button class="btn3d ghost" id="installUpdateBtn" hidden>Install &amp; restart</button>
+            </div>
+          </div>
+          <div class="set-card">
+            <span class="ic" data-icon="gear" data-tone="slate"></span>
+            <h3>Preferences</h3>
+            <label class="switch"><input type="checkbox" id="prefConfirm" checked><i></i>Ask before Quarantine All</label>
+            <label class="switch"><input type="checkbox" id="prefHistory" checked><i></i>Keep scan history</label>
+          </div>
+          <div class="set-card">
+            <span class="ic" data-icon="shield" data-tone="emerald"></span>
+            <h3>About</h3>
+            <p><b>BaazCyber Antivirus</b> <span id="aboutVer"></span><br>A FlightCoders company. Your files are scanned on this computer and never uploaded.</p>
           </div>
         </div>
       </section>
@@ -171,6 +220,7 @@
   </div>
 
   <div class="toast" id="toast" hidden></div>
+  <script src="vendor/jspdf.umd.min.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>

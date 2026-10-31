@@ -56,6 +56,30 @@ fn quick_targets() -> Vec<Target> {
     }).collect()
 }
 
+fn pdf_path(path: &str) -> Result<PathBuf, String> {
+    let p = PathBuf::from(path);
+    if p.extension().is_some_and(|e| e.eq_ignore_ascii_case("pdf")) { Ok(p) } else { Err("Reports can only be saved as .pdf files".into()) }
+}
+
+/// Write a PDF security report the window generated to the path the user chose in the save dialog.
+#[tauri::command]
+fn save_report(path: String, data: Vec<u8>) -> Result<(), String> {
+    if !data.starts_with(b"%PDF-") { return Err("The report is not a valid PDF".into()); }
+    std::fs::write(pdf_path(&path)?, data).map_err(|e| e.to_string())
+}
+
+/// Open a saved report in the default PDF viewer.
+#[tauri::command]
+fn open_report(path: String) -> Result<(), String> {
+    tauri_plugin_opener::open_path(pdf_path(&path)?, None::<&str>).map_err(|e| e.to_string())
+}
+
+/// The Windows system drive root (usually C:\), for a full scan.
+#[tauri::command]
+fn system_drive() -> String {
+    std::env::var("SystemDrive").map(|d| format!("{d}\\")).unwrap_or_else(|_| "C:\\".into())
+}
+
 #[tauri::command]
 fn signature_count(state: State<App>) -> usize { state.scanner.db.hash_count() }
 
@@ -147,7 +171,7 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(App { scanner: load_scanner(), current: Mutex::new(None) })
         .invoke_handler(tauri::generate_handler![
-            quick_targets, signature_count, start_scan, cancel_scan,
+            quick_targets, system_drive, signature_count, save_report, open_report, start_scan, cancel_scan,
             quarantine_file, list_quarantine, restore_quarantine, delete_quarantine
         ])
         .run(tauri::generate_context!())
