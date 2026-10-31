@@ -185,6 +185,20 @@ async function init() {
   if (last) $("#statLastFiles").textContent = last.files.toLocaleString(), $("#statThreats").textContent = last.threats;
   refreshQuarantineBadge();
   updateScore();
+  setTimeout(checkForUpdateOnStart, 4000);
+}
+
+async function checkForUpdateOnStart() {
+  if (!T.updater) return;
+  try {
+    const update = await T.updater.check();
+    if (!update) return;
+    pendingUpdate = update;
+    $("#updateText").textContent = `Version ${update.version} is ready to install.`;
+    $("#installUpdateBtn").hidden = false;
+    const ok = await dialog.ask(`BaazCyber Antivirus ${update.version} is ready. Install it now? The app will restart.`, { title: "Update available", kind: "info" });
+    if (ok) { toast("Downloading the update…"); await update.downloadAndInstall(); }
+  } catch {}
 }
 
 // ── Scanning ──────────────────────────────────────────
