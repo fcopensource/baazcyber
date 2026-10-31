@@ -122,3 +122,37 @@ fn flags_defender_tampering_and_ransomware_notes() {
     let wipe = j(&["vssadmin", ".exe delete shadows /all /quiet\n"]);
     assert_eq!(s.scan_bytes("x.bat", &wipe).unwrap().name, "Trojan.DisableDefender");
 }
+
+#[test]
+fn flags_credential_theft_tools() {
+    let s = scanner();
+    let amsi = j(&["[Ref].Assembly.GetType('System.Management.Automation.Amsi", "Utils')\n"]);
+    assert_eq!(s.scan_bytes("x.ps1", &amsi).unwrap().name, "Trojan.AmsiBypass");
+    let mimi = j(&["Invoke-Mimi", "katz -Command 'sekurlsa::logon", "passwords'\n"]);
+    assert_eq!(s.scan_bytes("x.ps1", &mimi).unwrap().name, "HackTool.Mimikatz");
+    let dump = j(&["rundll32 C:\\Windows\\System32\\com", "svcs.dll, Mini", "Dump 624 C:\\temp\\l.dmp full\n"]);
+    assert_eq!(s.scan_bytes("x.bat", &dump).unwrap().name, "Spyware.LsassDump");
+}
+
+#[test]
+fn flags_web_shells_but_not_ordinary_pages() {
+    let s = scanner();
+    let php = j(&["<?php @ev", "al(base64_decode($_PO", "ST['c'])); ?>\n"]);
+    assert_eq!(s.scan_bytes("upload.php", &php).unwrap().name, "Backdoor.WebShell");
+    let jsp = j(&["<% Runtime.getRuntime().ex", "ec(request.getParameter(\"cmd\")); %>\n"]);
+    assert_eq!(s.scan_bytes("cmd.jsp", &jsp).unwrap().name, "Backdoor.WebShell");
+    let page = b"<?php echo htmlspecialchars($_GET['name'] ?? 'guest'); ?>\n";
+    assert!(s.scan_bytes("hello.php", page).is_none(), "reading a form value is not a web shell");
+}
+
+#[test]
+fn weak_admin_signals_only_flag_together() {
+    let s = scanner();
+    let clear = j(&["wevt", "util cl Security\n"]);
+    assert!(s.scan_bytes("cleanup.bat", &clear).is_none(), "clearing logs alone is an admin task");
+    let combo = j(&["net localgroup administrators svc", "_backup /add\nwevt", "util cl Security\n"]);
+    let t = s.scan_bytes("setup.bat", &combo).expect("a hidden admin plus wiped logs is flagged");
+    assert_eq!(t.name, "Backdoor.AdminAccount");
+    let uac = j(&["reg add HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System /v Enable", "LUA /t REG_DWORD /d 0 /f\n"]);
+    assert_eq!(s.scan_bytes("x.cmd", &uac).unwrap().name, "Trojan.DisableUAC");
+}

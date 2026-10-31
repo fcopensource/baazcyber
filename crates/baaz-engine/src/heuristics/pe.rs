@@ -72,6 +72,12 @@ pub fn evidence(data: &[u8]) -> Vec<Evidence> {
     }
     // Mining software, recognisable by its own strings.
     let text = String::from_utf8_lossy(&data[..data.len().min(8 * 1024 * 1024)]);
+    // Stored reversed and turned around at run time, so BaazCyber's own program file doesn't match.
+    let tool_strings = ["sdrowssapnogol::aslrukes", "mas::pmudasl", "cnycsd::pmudasl", "nedlog::soreberk", "iwkilitneg"]
+        .map(|s| s.chars().rev().collect::<String>());
+    if tool_strings.iter().any(|s| text.contains(s.as_str())) {
+        out.push(Evidence::new("HackTool.Mimikatz", if signed { 40 } else { 95 }, "It contains Mimikatz, a tool that steals Windows passwords and login tickets from memory."));
+    }
     if text.contains("stratum+tcp://") || text.contains("stratum+ssl://") || text.contains("xmrig") || text.contains("cryptonight") {
         out.push(Evidence::new("PUA.CoinMiner", 70, "It contains cryptocurrency mining code, which uses your computer's power to earn money for someone else.").pua());
     }

@@ -1,12 +1,13 @@
-//! Scripts: PowerShell, batch files, VBScript, JavaScript, HTA, Python and shell scripts.
-//! These are the most common first stage of an attack, because they run with a double click.
+//! Scripts: PowerShell, batch files, VBScript, JavaScript, HTA, Python, shell scripts and web-server pages
+//! (PHP, ASP/ASPX, JSP). Desktop scripts are the usual first stage of an attack because they run with a
+//! double click; web-server pages are where web shells hide.
 
 use super::Evidence;
 use regex::Regex;
 use std::sync::LazyLock;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Lang { PowerShell, Batch, VbScript, JavaScript, Hta, Python, Shell }
+pub enum Lang { PowerShell, Batch, VbScript, JavaScript, Hta, Python, Shell, Php, Asp, Jsp }
 
 pub fn language(name: &str, data: &[u8]) -> Option<Lang> {
     let ext = name.rsplit('.').next().unwrap_or("").to_lowercase();
@@ -18,6 +19,9 @@ pub fn language(name: &str, data: &[u8]) -> Option<Lang> {
         "hta" => Lang::Hta,
         "py" | "pyw" => Lang::Python,
         "sh" | "bash" => Lang::Shell,
+        "php" | "phtml" | "php5" | "php7" | "phar" => Lang::Php,
+        "asp" | "aspx" | "ashx" | "asmx" => Lang::Asp,
+        "jsp" | "jspx" => Lang::Jsp,
         _ if data.starts_with(b"#!") => if data.starts_with(b"#!/usr/bin/env python") || data.starts_with(b"#!/usr/bin/python") { Lang::Python } else { Lang::Shell },
         _ => return None,
     };
@@ -42,6 +46,15 @@ static PATTERNS: LazyLock<Vec<Pattern>> = LazyLock::new(|| {
         p("Backdoor.ReverseShell", 95, r"(?i)/dev/(?:tcp|udp)/[\w.-]+/\d+|\bnc(?:at)?\b[^\n]{0,60}\s-[ec]\s|\b(?:ba)?sh\s+-i\s*>&|\bpty\.spawn\s*\(\s*['\x22]/bin/|New-Object\s+(?:System\.)?Net\.Sockets\.TCPClient", "It opens a remote command line for an attacker (a reverse shell): full control of the computer."),
         p("Trojan.DisableDefender", 95, r"(?i)\bSet-MpPreference\b[^\n]*-Disable\w*\s+\$?true|\bAdd-MpPreference\b[^\n]*-Exclusion(?:Path|Process|Extension)\b|\bnetsh\s+(?:adv)?firewall\s+set\s+[^\n]*state\s+off|\bvssadmin(?:\.exe)?\s+delete\s+shadows\b|\bwmic\s+shadowcopy\s+delete\b|\bwbadmin\s+delete\s+catalog\b|\bbcdedit\b[^\n]*recoveryenabled\s+no", "It turns off Windows Defender or the firewall, or deletes backup copies of your files. Ransomware does exactly this before encrypting."),
         p("Trojan.Persistence", 50, r"(?i)\bschtasks(?:\.exe)?\s+/create\b|\\CurrentVersion\\Run(?:Once)?\b|\bRegister-ScheduledTask\b|\bStartup\\[^\n]*\.(?:lnk|bat|vbs|exe)\b|\(\s*crontab\s+-l", "It sets itself up to start automatically every time the computer starts or you sign in."),
+        // Empty groups "(?:)" split tool names in these patterns, so BaazCyber's own program file doesn't contain
+        // them and isn't mistaken for the tools (by itself or by other antivirus software).
+        p("Trojan.AmsiBypass", 90, r"(?i)\bamsi(?:)InitFailed\b|\bAmsi(?:)Utils\b|\bAmsi(?:)ScanBuffer\b[^\n]{0,200}\b(?:VirtualProtect|WriteProcessMemory|Marshal\]::Copy)", "It switches off the Windows Antimalware Scan Interface so security tools can no longer inspect the scripts it runs."),
+        p("HackTool.Mimikatz", 95, r"(?i)\bsekur(?:)lsa::(?:logonpasswords|wdigest|msv|pth)\b|\blsa(?:)dump::(?:sam|secrets|dcsync)\b|\bkerberos::gol(?:)den\b|\bInvoke-Mimi(?:)katz\b", "It runs Mimikatz, a tool that steals Windows passwords and login tickets from memory."),
+        p("Spyware.LsassDump", 90, r"(?i)\bcomsvcs(?:\.dll)?\W{1,3}(?:#\s*24|MiniDump)\b|\bprocdump(?:64)?(?:\.exe)?\s[^\n]*\blsass\b|\bOut-Minidump\b[^\n]*\blsass", "It copies the memory of the Windows login process (LSASS), which holds the passwords of everyone signed in."),
+        p("Backdoor.WebShell", 90, r"(?i)\b(?:eval|assert|system|shell_exec|passthru|exec|popen|proc_open|create_function)\s*\(\s*(?:@?(?:base64_decode|gzinflate|str_rot13|stripslashes)\s*\(\s*)*@?\$_(?:GET|POST|REQUEST|COOKIE|SERVER|FILES)\b|Runtime\.getRuntime\(\)\.exec\s*\(\s*request\.getParameter|Process\.Start\s*\([^\n]{0,80}\bRequest(?:\.Form|\.QueryString|\.Params)?\s*\[", "It is a web shell: it runs whatever commands are sent to it through a web page, giving an attacker control of the server."),
+        p("Trojan.DisableUAC", 70, r"(?i)\bEnableLUA\b[^\n]{0,60}(?:/d\s+0\b|-Value\s+0\b|,\s*0\s*\)|=\s*dword:0+\b)", "It turns off User Account Control, so programs can get administrator rights without asking you."),
+        p("Trojan.ClearLogs", 50, r"(?i)\bwevtutil(?:\.exe)?\s+(?:cl|clear-log)\b|\bClear-EventLog\b|\bRemove-EventLog\b", "It erases Windows event logs, which removes the record of what happened on the computer."),
+        p("Backdoor.AdminAccount", 55, r"(?i)\bnet1?(?:\.exe)?\s+localgroup\s+administrators\s+\S+\s+/add\b|\bAdd-LocalGroupMember\b[^\n]*-Group\s+['\x22]?Administrators", "It adds a user to the Administrators group, a common way to keep hidden admin access to a computer."),
         p("Spyware.CredentialTheft", 70, r"(?i)\\Login Data\b|\\Local State\b|\bwallet\.dat\b|\\Exodus\\exodus\.wallet|Local Extension Settings\\nkbihfbeogaeaoehlefnkodbefgpgknn|\.ssh[\\/]id_(?:rsa|ed25519)|discord(?:app)?\.com/api/webhooks/|api\.telegram\.org/bot", "It reads saved browser passwords, crypto wallets or keys, or sends data to a Discord or Telegram bot, which is how stolen data is collected."),
     ];
     v.push(Pattern { name: "PUA.CoinMiner", score: 70, re: Regex::new(r"(?i)stratum\+(?:tcp|ssl|tls)://|\bxmrig\b|\b(?:minexmr|nanopool|supportxmr|moneroocean|nicehash)\.(?:com|org|net)\b").unwrap(), reason: "It runs a cryptocurrency miner, which uses your computer's power to earn money for someone else.", pua: true });
