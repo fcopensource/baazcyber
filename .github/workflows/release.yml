@@ -28,10 +28,11 @@ jobs:
         with:
           targets: x86_64-pc-windows-msvc
 
+      # The app is part of a Cargo workspace, so every crate builds into the top-level target/ folder.
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: app/src-tauri -> target
+          workspaces: . -> target
 
       - name: Install Node dependencies
         run: npm ci
@@ -42,19 +43,19 @@ jobs:
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
         run: npm run build -- --target x86_64-pc-windows-msvc
 
-      - name: Find bundle output
+      - name: List bundle output
         shell: bash
-        run: |
-          echo "=== bundle output ==="
-          find src-tauri/target -name "*.exe" -o -name "*.msi" 2>/dev/null | head -20 || true
+        run: find ../target/x86_64-pc-windows-msvc/release/bundle -type f
 
       - name: Upload Windows installer
         uses: actions/upload-artifact@v4
         with:
           name: windows-installer
           path: |
-            app/src-tauri/target/**/bundle/nsis/*.exe
-            app/src-tauri/target/**/bundle/msi/*.msi
+            target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe
+            target/x86_64-pc-windows-msvc/release/bundle/nsis/*.sig
+            target/x86_64-pc-windows-msvc/release/bundle/msi/*.msi
+            target/x86_64-pc-windows-msvc/release/bundle/msi/*.sig
           if-no-files-found: error
 
   release:
@@ -65,39 +66,36 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
-
       - name: Download Windows installer
         uses: actions/download-artifact@v4
         with:
           name: windows-installer
           path: dist/
 
+      # GitHub replaces spaces in release file names with dots, so rename first and the manifest URL matches.
+      - name: Name files the way GitHub will
+        run: |
+          find dist -type f -name "* *" | while read -r f; do mv "$f" "$(dirname "$f")/$(basename "$f" | tr ' ' '.')"; done
+          find dist -type f
+
       - name: Create updater manifest
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           NSIS=$(find dist -name "*-setup.exe" | head -1)
-          SIG_FILE="${NSIS}.sig"
-          SIGNATURE=""
-          if [ -f "$SIG_FILE" ]; then
-            SIGNATURE=$(cat "$SIG_FILE")
+          if [ -z "$NSIS" ] || [ ! -f "$NSIS.sig" ]; then
+            echo "::error::The NSIS installer or its updater signature is missing. Check TAURI_SIGNING_PRIVATE_KEY."
+            exit 1
           fi
-          DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          SIGNATURE=$(cat "$NSIS.sig")
           REPO="${{ github.repository }}"
-          cat > dist/latest.json <<EOF
-          {
-            "version": "${VERSION}",
-            "notes": "See https://github.com/${REPO}/releases/tag/${GITHUB_REF_NAME} for details.",
-            "pub_date": "${DATE}",
-            "platforms": {
-              "windows-x86_64": {
-                "url": "https://github.com/${REPO}/releases/download/${GITHUB_REF_NAME}/$(basename ${NSIS})",
-                "signature": "${SIGNATURE}"
-              }
-            }
-          }
-          EOF
-          echo "Manifest written:"
+          jq -n \
+            --arg version "$VERSION" \
+            --arg notes "See https://github.com/$REPO/releases/tag/$GITHUB_REF_NAME for what's new." \
+            --arg date "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --arg url "https://github.com/$REPO/releases/download/$GITHUB_REF_NAME/$(basename "$NSIS")" \
+            --arg sig "$SIGNATURE" \
+            '{version: $version, notes: $notes, pub_date: $date, platforms: {"windows-x86_64": {url: $url, signature: $sig}}}' \
+            > dist/latest.json
           cat dist/latest.json
 
       - name: Create GitHub Release
@@ -107,4 +105,5 @@ jobs:
           files: |
             dist/**/*.exe
             dist/**/*.msi
+            dist/**/*.sig
             dist/latest.json
