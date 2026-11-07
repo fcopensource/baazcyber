@@ -37,10 +37,23 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Check the updater signing key
+        shell: bash
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then
+            echo "::error::Add the TAURI_SIGNING_PRIVATE_KEY secret (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+
+      # The updater key was created without a password, so the password is always empty here. A value in the
+      # TAURI_SIGNING_PRIVATE_KEY_PASSWORD secret (GitHub does not allow empty secrets) would make signing fail
+      # with "Wrong password for that key".
       - name: Build and bundle
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         run: npm run build -- --target x86_64-pc-windows-msvc
 
       - name: List bundle output
