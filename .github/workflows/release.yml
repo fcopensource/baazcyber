@@ -50,11 +50,16 @@ jobs:
       # The updater key was created without a password, so the password is always empty here. A value in the
       # TAURI_SIGNING_PRIVATE_KEY_PASSWORD secret (GitHub does not allow empty secrets) would make signing fail
       # with "Wrong password for that key".
+      # Spaces or line breaks pasted into the secret (for example a trailing newline) break the base64 key
+      # ("Invalid symbol 10"), so they are stripped before the build signs anything.
       - name: Build and bundle
+        shell: bash
         env:
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          RAW_SIGNING_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
           TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
-        run: npm run build -- --target x86_64-pc-windows-msvc
+        run: |
+          export TAURI_SIGNING_PRIVATE_KEY="$(printf '%s' "$RAW_SIGNING_KEY" | tr -d '[:space:]')"
+          npm run build -- --target x86_64-pc-windows-msvc
 
       - name: List bundle output
         shell: bash
