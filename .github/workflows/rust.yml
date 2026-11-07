@@ -1,5 +1,8 @@
 name: Rust
 
+# Builds and tests the scanning engine, the CLI and the desktop app on every push and pull request.
+# BaazCyber is a Windows app (Tauri + WebView2), so this runs on Windows: on Linux the app would
+# need WebKitGTK system libraries it never uses.
 on:
   push:
     branches: [ "master" ]
@@ -11,12 +14,13 @@ env:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v4
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: Swatinem/rust-cache@v2
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --workspace --locked
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --workspace --locked
