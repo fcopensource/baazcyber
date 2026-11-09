@@ -1,10 +1,48 @@
+<div align="center">
+
+<img src="app/src-tauri/icons/icon-256.png" alt="BaazCyber Antivirus" width="112" />
+
 # BaazCyber Antivirus
 
-Fast, private malware scanning for Windows. A **BaazCyber** product, by **FlightCoders**.
+**Fast, private malware scanning for Windows.** A **BaazCyber** product, by **FlightCoders**.
+
+[![Latest release](https://img.shields.io/github/v/release/fcopensource/baazcyber?label=release&color=10b981)](https://github.com/fcopensource/baazcyber/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-2563eb)](#download)
+[![Engine: Rust](https://img.shields.io/badge/engine-Rust-000000?logo=rust&logoColor=white)](crates/baaz-engine)
+[![App: Tauri 2](https://img.shields.io/badge/app-Tauri%202-24C8D8?logo=tauri&logoColor=white)](app)
+
+[Download](#download) · [Screenshots](#screenshots) · [How it detects threats](#how-it-detects-threats) · [Privacy](https://veyraeditor.com/baazcyber/privacy)
+
+<img src="store/logos/hero-art-1920x1080.png" alt="BaazCyber Antivirus dashboard after a scan" width="100%" />
+
+</div>
 
 BaazCyber scans your files for malware, trojans, backdoors and malicious scripts, and quarantines what it
 finds. Everything runs on your computer: nothing is uploaded. It runs alongside Windows Defender as an extra
 layer; it does not replace it.
+
+## Download
+
+| | |
+| --- | --- |
+| **Windows installer (.msi)** | [BaazCyber.Antivirus_0.2.3_x64_en-US.msi](https://downloads.veyraeditor.com/baazcyber/v0.2.3/BaazCyber.Antivirus_0.2.3_x64_en-US.msi) |
+| **Windows installer (.exe)** | [GitHub release v0.2.3](https://github.com/fcopensource/baazcyber/releases/tag/v0.2.3) |
+| **Microsoft Store** | Submitted, coming soon |
+
+Windows 10 and 11, 64-bit. BaazCyber checks for signed updates when it starts and installs them only when you choose.
+
+## Screenshots
+
+| | |
+| --- | --- |
+| ![Dashboard](store/screenshots/01-dashboard.png) | ![A scan in progress](store/screenshots/02-scan-in-progress.png) |
+| **Dashboard:** security score, six scan types and the protection engines | **Scanning:** about 1,000 files a second, with live progress |
+| ![Scan results](store/screenshots/03-scan-results.png) | ![Quarantine](store/screenshots/04-quarantine.png) |
+| **Results:** every finding explained in plain words | **Quarantine:** threats encoded so they cannot run; restore or delete |
+| ![History](store/screenshots/05-history.png) | ![Settings](store/screenshots/06-settings.png) |
+| **History** of every scan | **Settings** and update status |
+
+*The screenshots show a scan of a demo drive (X:, 19,201 ordinary files plus BaazCyber's harmless test file), using real results from the BaazCyber 0.2.3 engine.*
 
 ```
 crates/baaz-engine   the scanning engine (Rust, no network): signatures, heuristics, quarantine
@@ -46,8 +84,9 @@ Add `--quarantine` to a scan to move every threat somewhere safe.
 
 ## The app
 
-A Tauri 2 desktop app with a dark glass interface: a protection dashboard, quick/full/custom scans with a live
-sweep animation, a results list, and a quarantine manager.
+A Tauri 2 desktop app with a dark 3D interface: a protection dashboard with a security score; Smart, Full,
+Folder, File, Downloads and Startup scans with live progress; a results list that explains every finding; a
+quarantine manager; scan history; and PDF security reports.
 
 ```
 cd app && npm run tauri dev      # run it
@@ -64,13 +103,14 @@ deleted for good.
 
 - **Real-time blocking** (stopping a file the instant it runs) needs a Microsoft-signed kernel driver, which
   requires an EV code-signing certificate and Microsoft driver attestation. Until then, BaazCyber scans on
-  demand and on a schedule, alongside Defender.
+  demand, alongside Defender.
 - **Appearing in Windows Security** needs membership of Microsoft's antivirus partner programme.
 
 ## Status
 
-Phase 1: engine, CLI and quarantine complete and tested. The desktop app and Microsoft Store packaging are in
-progress. Not a replacement for a full security suite yet.
+Version 0.2.3: the engine, the command-line scanner, quarantine and the desktop app are released, with signed
+automatic updates. The Microsoft Store listing assets are in [store/](store). Scanning is on demand, so use it
+alongside Windows Defender; it is not a replacement for a full security suite yet.
 
 ---
 
